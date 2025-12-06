@@ -78,3 +78,12 @@ Typical pin usage (can be adjusted):
 - IDE: Arduino IDE, PlatformIO or VS Code with Arduino/ESP32 extensions
 
 > ⚠️ Tip: Before pushing to GitHub, replace real Wi-Fi SSID/password in the code by placeholders or move them to a separate `secrets.h` that is not committed.
+Code Overview
+## Getting the Web UI Source (index_html.h)
+
+For the full web dashboard source code (`index_html.h`), please contact me directly:
+
+- Email: letronghoang0604@gmail.com  
+- Zalo: 0903240604  
+
+I will be happy to share the `index_html.h` file and instructions on how to integrate it into the project.
