@@ -1,0 +1,83 @@
+#include <HardwareSerial.h>
+
+HardwareSerial SerialNode(1);  // UART1
+
+#define RXD1 16   // Nhận từ TX ESP32-CAM
+#define TXD1 -1   // Không dùng TX
+
+#define LIGHT_PIN 5   // GPIO5
+#define FAN_PIN   18   // GPIO18
+#define PUMP_PIN  19   // GPIO19
+
+String inputString = "";
+
+void setup() {
+  Serial.begin(115200);  // Debug USB
+  SerialNode.begin(9600, SERIAL_8N1, RXD1, TXD1);  // UART nhận dữ liệu
+
+  pinMode(LIGHT_PIN, OUTPUT);
+  pinMode(FAN_PIN, OUTPUT);
+  pinMode(PUMP_PIN, OUTPUT);
+
+  digitalWrite(LIGHT_PIN, HIGH);
+  digitalWrite(FAN_PIN, HIGH);
+  digitalWrite(PUMP_PIN, HIGH);
+
+  Serial.println("✅ ESP32 DevKit sẵn sàng.");
+}
+
+void loop() {
+  while (SerialNode.available()) {
+    char ch = SerialNode.read();
+
+    // ✅ Cách 1: Lọc ký tự không in được
+    if ((ch >= 32 && ch <= 126) || ch == '\n') {
+      inputString += ch;
+    }
+
+    // Khi nhận ký tự xuống dòng => xử lý lệnh
+    if (ch == '\n') {
+      inputString.trim();
+
+      // ✅ Cách 2: Loại bỏ ký tự lạ còn sót trong chuỗi
+      String cleanedCmd = "";
+      for (int i = 0; i < inputString.length(); i++) {
+        char c = inputString.charAt(i);
+        if (c >= 32 && c <= 126) cleanedCmd += c;
+      }
+
+      handleCommand(cleanedCmd);
+      inputString = "";
+    }
+  }
+}
+
+void handleCommand(String cmd) {
+  Serial.print("📥 Nhận lệnh: ");
+  Serial.println(cmd);
+
+  if (cmd == "RELAY1_ON") {
+    digitalWrite(LIGHT_PIN, LOW);
+    Serial.println("💡 Bật đèn");
+  } else if (cmd == "RELAY1_OFF") {
+    digitalWrite(LIGHT_PIN, HIGH);
+    Serial.println("💡 Tắt đèn");
+
+  } else if (cmd == "RELAY2_ON") {
+    digitalWrite(FAN_PIN, LOW);
+    Serial.println("🌀 Bật quạt");
+  } else if (cmd == "RELAY2_OFF") {
+    digitalWrite(FAN_PIN, HIGH);
+    Serial.println("🌀 Tắt quạt");
+
+  } else if (cmd == "RELAY3_ON") {
+    digitalWrite(PUMP_PIN, LOW);
+    Serial.println("💧 Bật bơm");
+  } else if (cmd == "RELAY3_OFF") {
+    digitalWrite(PUMP_PIN, HIGH);
+    Serial.println("💧 Tắt bơm");
+
+  } else {
+    Serial.println("⚠️ Lệnh không hợp lệ");
+  }
+}
